@@ -1,1 +1,4 @@
-# Add your dependencies here
+Django==5.2.10
+psycopg2-binary==2.9.11
+iot-logging-schemas @ git+https://github.com/IoT-Hub-Alpha/logging-lib.git@060984bc34287e16462b67ca3b22ec5f6d9b8563
+iot-auth @ git+https://github.com/IoT-Hub-Alpha/jwt-auth-lib.git@cc16ed2022f948919496b2760dcffc8e84d83407
