@@ -21,6 +21,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "iot_logging.django_helpers.RequestContextMiddleware",
+    "app.core.auth.PublicPathJWTAuthMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -79,18 +81,25 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "")
+JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
+INTERNAL_SERVICE_HEADER = os.getenv(
+    "INTERNAL_SERVICE_HEADER",
+    "X-Internal-Service",
+)
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
-        "default": {
-            "format": "%(levelname)s %(name)s %(message)s",
+        "json": {
+            "()": "iot_logging.StructuredJsonFormatter",
         }
     },
     "handlers": {
         "console": {
             "class": "logging.StreamHandler",
-            "formatter": "default",
+            "formatter": "json",
         }
     },
     "root": {

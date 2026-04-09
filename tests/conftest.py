@@ -11,4 +11,9 @@ if str(ROOT_DIR) not in sys.path:
 
 @pytest.fixture
 def client():
+    return Client(HTTP_X_INTERNAL_SERVICE="test-suite")
+
+
+@pytest.fixture
+def raw_client():
     return Client()

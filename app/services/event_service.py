@@ -3,6 +3,7 @@ from __future__ import annotations
 import csv
 import io
 import json
+import logging
 from dataclasses import dataclass
 from typing import Any
 from uuid import UUID
@@ -13,6 +14,9 @@ from django.db.models import QuerySet
 from django.http import HttpRequest
 
 from app.api.models import Event
+
+
+logger = logging.getLogger(__name__)
 
 
 class ApiError(Exception):
@@ -311,14 +315,36 @@ def _save_event(event: Event) -> Event:
 
 def create_event(data: dict[str, Any]) -> Event:
     event = Event(**_normalize_payload(data, partial=False, creating=True))
-    return _save_event(event)
+    saved_event = _save_event(event)
+    logger.info(
+        "event.created",
+        extra={
+            "event_id": saved_event.id,
+            "rule_id": str(saved_event.rule_id),
+            "device_id": str(saved_event.device_id),
+            "severity": saved_event.severity,
+            "status": saved_event.status,
+        },
+    )
+    return saved_event
 
 
 def update_event(event: Event, data: dict[str, Any], *, partial: bool) -> Event:
     cleaned = _normalize_payload(data, partial=partial, creating=False)
     for key, value in cleaned.items():
         setattr(event, key, value)
-    return _save_event(event)
+    saved_event = _save_event(event)
+    logger.info(
+        "event.updated",
+        extra={
+            "event_id": saved_event.id,
+            "rule_id": str(saved_event.rule_id),
+            "device_id": str(saved_event.device_id),
+            "severity": saved_event.severity,
+            "status": saved_event.status,
+        },
+    )
+    return saved_event
 
 
 def acknowledge_event(event: Event) -> Event:

@@ -5,11 +5,21 @@ from django.db import DatabaseError
 
 
 @pytest.mark.django_db
-def test_health_endpoint_returns_ok(client):
+def test_health_endpoint_returns_ok_and_request_id_header(client):
     response = client.get("/health/")
 
     assert response.status_code == 200
     assert response.json() == {"status": "ok"}
+    assert "X-Request-ID" in response
+    assert response["X-Request-ID"]
+
+
+@pytest.mark.django_db
+def test_health_endpoint_reuses_incoming_request_id(client):
+    response = client.get("/health/", HTTP_X_REQUEST_ID="test-request-id")
+
+    assert response.status_code == 200
+    assert response["X-Request-ID"] == "test-request-id"
 
 
 @pytest.mark.django_db
